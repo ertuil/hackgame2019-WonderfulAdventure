@@ -48,6 +48,7 @@ type SendMsg struct {
 	From    string
 	Content string
 	Options []string
+	State   state
 }
 
 func (s *SendMsg) LoadSendToJson() ([]byte, error) {
@@ -58,12 +59,25 @@ func (s *SendMsg) LoadSendToJson() ([]byte, error) {
 	return j, nil
 }
 
+func MsgInit(from, content string, options []string, se state) SendMsg {
+	msg1 := SendMsg{}
+	msg1.From = from
+	msg1.Content = content
+	msg1.Options = options
+	msg1.State = se
+	return msg1
+}
+
+func MsgInitJson(from, content string, options []string, se state) ([]byte, error) {
+	msg := MsgInit(from, content, options, se)
+	return msg.LoadSendToJson()
+}
+
 // Response
 
 type RespMsg struct {
-	From    string
-	Content string
-	Options []string
+	Msg string
+	Opt int
 }
 
 func ReadRespMsg(b []byte) (RespMsg, error) {

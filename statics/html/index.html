@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <title>达拉崩吧大冒险</title>
     <link rel="stylesheet" href="/statics/css/bootstrap.min.css" >
-    <script src="/statics/js/jquery.slim.min.js" ></script>
+    <link rel="stylesheet" href="/statics/css/default.css" >
+    <script src="/statics/js/jquery.min.js" ></script>
+    <script src="/statics/js/default.js" ></script>
     <script src="/statics/js/bootstrap.bundle.js"></script>
 
 </head>
@@ -12,9 +14,75 @@
 
 <!-- 这里是 Narbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-primary">
-    <a class="navbar-brand " href="#">大冒险</a>
+    <a class="navbar-brand text-light" href="#">大冒险</a>
+    <ul class="nav mr-auto">
+        <li class="nav-item text-light"><a id="start">重新开始罪恶的一生</a></li>
+    </ul>
 </nav>
 
+<div class="container outdiv">
+    <div class="row updiv">
+        <div class="col-8 maindiv">
+            <div id="alist">
 
+            </div>
+        </div>
+        <div class="col-4 sidediv" id="info">
+            <h4>Name:</h4>
+            <p id="info_name"></p>
+            <h4>Money:</h4>
+            <p id="info_money"></p>
+            <h4>Attack:</h4>
+            <p id="info_attack"></p>
+        </div>
+    </div>
+    <div class="container">
+        <form class="form-inline">
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="value" class="sr-only">Input:</label>
+                <select id="input">
+                </select>
+            </div>
+            <button id="send"  type="button" class="btn btn-primary mb-2">Send</button>
+        </form>
+    </div>
+</div>
+
+<script>
+
+    $("#start").click(function () {
+            location.reload();
+        }
+    );
+
+
+    let host = window.location.host;
+    let ws = new WebSocket("ws://"+host+"/ws");
+
+    ws.onopen = function(evt) {
+        addMsg("画外音","进入同步！");
+    };
+
+    ws.onmessage = function(evt) {
+        console.log( "Received Message: " + evt.data);
+        js = JSON.parse(evt.data);
+        addMsg(js["From"],js["Content"]);
+        updateState(js["State"]);
+        loadOptions(js["Options"])
+    };
+
+    ws.onclose = function(evt) {
+        addMsg("画外音","失去同步！");
+    };
+
+    $("#send").click(
+        function () {
+            let v = $("#input option:selected").val()
+            console.log(v);
+            ws.send(v)
+        }
+    );
+
+</script>
 </body>
 </html>

@@ -6,6 +6,8 @@ import (
 	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
+	"runtime"
+	"time"
 )
 
 const (
@@ -28,58 +30,57 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 func WebSocketHandler(w http.ResponseWriter, r *http.Request) {
 
 	c, _ := upgrader.Upgrade(w, r, nil)
-	defer c.Close()
 
-	for {
-		mt, message, _ := c.ReadMessage()
-		c.WriteMessage(mt, append([]byte("hello "), message[:]...))
-	}
-
+	go CoreWsHandle(c)
 }
 
-func StartHandler(w http.ResponseWriter, r *http.Request) {
-	session, err := store.Get(r, "session")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+func CoreWsHandle(c *websocket.Conn) {
+	defer c.Close()
 
-	session.Options = &sessions.Options{
-		Path:     "/",
-		MaxAge:   1200, // 20 minutes
-		HttpOnly: true,
-	}
+	se := state{}
+	se.setState(0, 0, 10, "")
 
-	session.Values["attack"] = 0
-	session.Values["money"] = 10
-	session.Values["name"] = ""
-	session.Values["stage"] = 0
-	err = session.Save(r, w)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	var err error
+	for {
+		switch se.Stage {
+		case 0:
+			err = Stage_0(c, &se)
+		case 1:
+			err = Stage_1(c, &se)
+		case 2:
+			err = Stage_2(c, &se)
+		case 3:
+			err = Stage_3(c, &se)
+		case 10:
+			getFlag(c, &se)
+		}
+		if err != nil {
+			j, _ := MsgInitJson("系统", err.Error(), []string{}, se)
+			_ = c.WriteMessage(websocket.TextMessage, j)
+			break
+		}
+		if se.Stage == failstate {
+			break
+		}
+		time.Sleep(300 * time.Microsecond)
 	}
-
-	j, err := loadFromSessionToJson(session)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	_, _ = w.Write(j)
 }
 
 func main() {
+	// 争取更多资源
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	// 释放静态资源
 	if err := asset.RestoreAssets(".", "statics"); err != nil {
 		log.Panic(err)
 	}
+	// 初始化状态转移矩阵
+	stateTransInit()
 
 	// 路由
 	http.Handle("/statics/", http.StripPrefix("/statics/", http.FileServer(http.Dir("./statics"))))
 	http.HandleFunc("/", IndexHandler)
 	http.HandleFunc("/ws", WebSocketHandler)
-	http.HandleFunc("/start", StartHandler)
 
 	// 启动服务
 	log.Println("Start listening to", dbugHost)
@@ -88,4 +89,11 @@ func main() {
 		log.Fatal("ListenAndServe: ", err)
 	}
 
+}
+
+func getFlag(c *websocket.Conn, se *state) {
+	flag := "flag{123}"
+	j, _ := MsgInitJson("系统", flag, []string{}, *se)
+	_ = c.WriteMessage(websocket.TextMessage, j)
+	se.Stage = 11
 }
