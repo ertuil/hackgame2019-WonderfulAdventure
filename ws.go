@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"github.com/gorilla/websocket"
 	"math/rand"
 	"strconv"
@@ -85,14 +84,18 @@ func Stage1(c *websocket.Conn, se *state) error {
 // 门口失败
 func Stage2(c *websocket.Conn, se *state) error {
 	j, err := MsgInitJson(s2f0, s2c0, []string{}, *se)
-
 	if err != nil {
 		return err
 	}
 	c.WriteMessage(websocket.TextMessage, j)
 
+	j, err = MsgInitJson("旁白", "你被门卫击败了。", []string{}, *se)
+	if err != nil {
+		return err
+	}
+	c.WriteMessage(websocket.TextMessage, j)
 	se.Stage = failstate
-	return errors.New("你被门卫击败了。")
+	return nil
 }
 
 // 	去哪里
@@ -121,7 +124,7 @@ func Stage3(c *websocket.Conn, se *state) error {
 // 大市场 漏洞主体
 func Stage4(c *websocket.Conn, se *state) error {
 
-	j, err := MsgInitJson(s4f0, s4c0, []string{s4a0, s4a1, s4a2, s4a3, s4a4}, *se)
+	j, err := MsgInitJson(s4f0, s4c0, []string{s4a0, s4a1, s4a2, s4a3, s4a4, s4a5, s4a6, s4a7, s4a8, s4a9, s4a10}, *se)
 	if err != nil {
 		return err
 	}
@@ -157,6 +160,17 @@ func Stage4(c *websocket.Conn, se *state) error {
 // 打怪刷机
 func Stage5(c *websocket.Conn, se *state) error {
 
+	se.count += 1
+	if se.count >= 10 {
+		j, err := MsgInitJson(s5f1, s5c1, []string{}, *se)
+		if err != nil {
+			return err
+		}
+		_ = c.WriteMessage(websocket.TextMessage, j)
+		se.Stage = 11
+		return nil
+	}
+
 	rand.Seed(time.Now().Unix())
 	dat := 10 * rand.Intn(20)
 
@@ -174,7 +188,13 @@ func Stage5(c *websocket.Conn, se *state) error {
 		}
 		_ = c.WriteMessage(websocket.TextMessage, j)
 	} else {
-		return errors.New("战斗力不足，你被击败了。")
+		j, err = MsgInitJson("旁白", "战斗力不足，你被击败了。", []string{}, *se)
+		if err != nil {
+			return err
+		}
+		c.WriteMessage(websocket.TextMessage, j)
+		se.Stage = failstate
+		return nil
 	}
 	se.Stage = 3
 	return nil
@@ -214,7 +234,13 @@ func Stage6(c *websocket.Conn, se *state) error {
 		}
 		_ = c.WriteMessage(websocket.TextMessage, j)
 	} else {
-		return errors.New(s6c3)
+		j, err = MsgInitJson("旁白", s6c3, []string{}, *se)
+		if err != nil {
+			return err
+		}
+		c.WriteMessage(websocket.TextMessage, j)
+		se.Stage = failstate
+		return nil
 	}
 
 	se.Stage = 7
@@ -248,5 +274,10 @@ func Stage7(c *websocket.Conn, se *state) error {
 	}
 	_ = c.WriteMessage(websocket.TextMessage, j)
 
+	return nil
+}
+
+func Stage8(c *websocket.Conn, se *state) error {
+	se.Stage = succstate
 	return nil
 }

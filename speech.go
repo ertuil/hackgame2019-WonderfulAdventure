@@ -37,17 +37,26 @@ const (
 	s3a1 = "打怪升级"
 	s3a2 = "去恶龙洞穴"
 
-	s4f0 = "隔壁王大妈"
-	s4c0 = "走过路过不要错过，这里有鲜美香脆可口甘甜现炸童子鸡，有效提升攻击力，现在只要两元钱，两块钱，你买不了吃亏，买不了上当。这位客官，你要来几只啊？"
-	s4a0 = "0只"
-	s4a1 = "1只"
-	s4a2 = "2只"
-	s4a3 = "3只"
-	s4a4 = "4只"
+	s4f0  = "隔壁王大妈"
+	s4c0  = "走过路过不要错过，这里有鲜美香脆可口甘甜现炸童子鸡，有效提升攻击力，现在只要两元钱，两块钱，你买不了吃亏，买不了上当。这位客官，你要来几只啊？"
+	s4a0  = "0只"
+	s4a1  = "1只"
+	s4a2  = "2只"
+	s4a3  = "3只"
+	s4a4  = "4只"
+	s4a5  = "5只"
+	s4a6  = "6只"
+	s4a7  = "7只"
+	s4a8  = "8只"
+	s4a9  = "9只"
+	s4a10 = "10只"
 
 	s4f1 = "旁白"
 	s4c1 = "你感觉自己浑身充满了干劲"
 	s4c2 = "你一穷二白，付不起那么多钱"
+
+	s5f1 = "旁白"
+	s5c1 = "由于你的赶尽杀绝，附近已经没有小怪兽了,你也当地动物保护组织拘留了。"
 
 	s6f0 = "巨龙昆图库塔卡提考特苏瓦西拉松"
 	s6c0 = "我是恶龙昆图库塔卡提考特苏瓦西拉松"
@@ -80,10 +89,10 @@ func stateTransInit() {
 }
 
 func GetStateTrans(from, opt int) int {
-	if from >= len(stateTrans) {
+	if from < 0 || from >= len(stateTrans) {
 		return failstate
 	}
-	if opt >= len(stateTrans[from]) {
+	if opt < 0 || opt >= len(stateTrans[from]) {
 		return failstate
 	}
 	return stateTrans[from][opt]

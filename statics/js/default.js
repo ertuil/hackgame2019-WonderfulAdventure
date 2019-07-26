@@ -6,6 +6,13 @@ function addMsg(from, content) {
     let alist = $("#alist");
     alist.append("<h4>"+from+":</h4>");
     alist.append("<p>"+content+"</p>");
+
+    let scrollHeight =alist.prop("scrollHeight");
+    console.log(scrollHeight);
+    if ( typeof(scrollHeight) == "undefined") {
+        alist.animate({scrollTop:scrollHeight},400);
+    }
+
 }
 
 function updateState(state) {

@@ -13,39 +13,41 @@
 <body>
 
 <!-- 这里是 Narbar -->
-<nav class="navbar navbar-expand-lg navbar-light bg-primary">
-    <a class="navbar-brand text-light" href="#">达拉崩吧大冒险</a>
-    <ul class="nav mr-auto">
-        <li class="nav-item text-light"><a id="start">重新开始罪恶的一生</a></li>
-    </ul>
-</nav>
+<div class="up">
+    <nav class="navbar navbar-expand-lg navbar-light bg-primary">
+        <a class="navbar-brand text-light" href="#">达拉崩吧大冒险</a>
+        <ul class="nav mr-auto">
+            <li class="nav-item text-light mr-auto"><a id="start">重新开始罪恶的一生</a></li>
+            <li class="nav-item text-light mr-auto"><a href="https://www.bilibili.com/video/av9372087/">有这样一个故事</a></li>
+        </ul>
+    </nav>
+</div>
 
-<div class="container outdiv">
-    <div class="row updiv">
-        <div class="col-8 maindiv">
-            <div id="alist">
 
-            </div>
-        </div>
-        <div class="col-4 sidediv" id="info">
-            <h4>Name:</h4>
-            <p id="info_name"></p>
-            <h4>Money:</h4>
-            <p id="info_money"></p>
-            <h4>Attack:</h4>
-            <p id="info_attack"></p>
-        </div>
+<div class="outdiv">
+
+    <div class="maindiv mt-3" id="alist">
     </div>
-    <div class="container">
+
+    <div class="sidediv mt-3" id="info">
+        <h4>Name:</h4>
+        <p id="info_name"></p>
+        <h4>Money:</h4>
+        <p id="info_money"></p>
+        <h4>Attack:</h4>
+        <p id="info_attack"></p>
+    </div>
+
+    <div class="down">
         <form class="form-inline">
-            <div class="form-group mx-sm-3 mb-2">
-                <label for="value" class="sr-only">Input:</label>
-                <select id="input">
+            <div class="form-group mr-2 ml-2" >
+                <select id="input" style="height: 38px;">
                 </select>
             </div>
-            <button id="send"  type="button" class="btn btn-primary mb-2">Send</button>
+            <button id="send"  type="button" class="btn btn-primary" style="border-radius: 0;">Send</button>
         </form>
     </div>
+
 </div>
 
 <script>
@@ -57,7 +59,7 @@
     let ws = new WebSocket("ws://"+host+"/ws");
 
     ws.onopen = function(evt) {
-        addMsg("旁白","进入同步(Websocket连接)！");
+        addMsg("旁白","进入同步！");
     };
 
     ws.onmessage = function(evt) {
@@ -73,7 +75,7 @@
     };
 
     ws.onclose = function(evt) {
-        addMsg("旁白","失去同步！(Websocket结束)");
+        addMsg("旁白","失去同步！");
     };
 
     $("#send").click(

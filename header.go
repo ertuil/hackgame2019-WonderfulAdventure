@@ -10,6 +10,7 @@ type state struct {
 	Attack int
 	Money  int
 	Name   string
+	count  int
 }
 
 func (s *state) getState() (int, int, int, string) {

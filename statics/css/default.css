@@ -15,24 +15,29 @@ body {
 }
 
 .outdiv {
-    height: 100% ;
-}
-
-.updiv {
-    height: 80% ;
+    display: -webkit-flex;
+    height: 100%;
+    display: grid;
+    grid-template-rows:  4fr 1fr;
+    grid-template-columns: 65% 35%;
 }
 
 .maindiv {
-    overflow: scroll;
-    border-right:  1px solid #ccc;
-    height: 100% ;
+    margin-left: 20px ;
+    margin-right: 20px ;
 }
 
 .sidediv {
-    height: 100% ;
+    margin-left: 20px ;
+    margin-right: 20px ;
+}
+
+.down {
+    grid-auto-flow: row;
 }
 
 #alist {
+    border-right:  1px solid #ccc;
     overflow: scroll;
     overflow-scrolling: touch;
 }

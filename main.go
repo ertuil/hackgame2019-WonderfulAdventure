@@ -42,7 +42,7 @@ func CoreWsHandle(c *websocket.Conn) {
 
 	se := state{}
 	se.setState(0, 0, 100, "")
-
+	se.count = 0
 	var err error
 	for {
 		switch se.Stage {
@@ -67,12 +67,14 @@ func CoreWsHandle(c *websocket.Conn) {
 		default:
 			err = errors.New(errst)
 		}
+		// 破产
+		if se.Money < 0 {
+			j, _ := MsgInitJson("旁白", "你已经破产了！", []string{}, se)
+			_ = c.WriteMessage(websocket.TextMessage, j)
+			break
+		}
 		if err != nil {
-			tmp := errst
-			if debug == true {
-				tmp = errst + ":" + err.Error()
-			}
-			j, _ := MsgInitJson("旁白", tmp, []string{}, se)
+			j, _ := MsgInitJson("旁白", errst, []string{}, se)
 			_ = c.WriteMessage(websocket.TextMessage, j)
 			break
 		}
