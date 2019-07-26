@@ -14,7 +14,7 @@
 
 <!-- 这里是 Narbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-primary">
-    <a class="navbar-brand text-light" href="#">大冒险</a>
+    <a class="navbar-brand text-light" href="#">达拉崩吧大冒险</a>
     <ul class="nav mr-auto">
         <li class="nav-item text-light"><a id="start">重新开始罪恶的一生</a></li>
     </ul>
@@ -50,17 +50,14 @@
 
 <script>
 
-    $("#start").click(function () {
-            location.reload();
-        }
-    );
 
+    let opts;
 
     let host = window.location.host;
     let ws = new WebSocket("ws://"+host+"/ws");
 
     ws.onopen = function(evt) {
-        addMsg("画外音","进入同步！");
+        addMsg("旁白","进入同步(Websocket连接)！");
     };
 
     ws.onmessage = function(evt) {
@@ -68,18 +65,30 @@
         js = JSON.parse(evt.data);
         addMsg(js["From"],js["Content"]);
         updateState(js["State"]);
-        loadOptions(js["Options"])
+        loadOptions(js["Options"]);
+        opts = js["Options"];
+
+        let div = document.getElementById('alist');
+        div.scrollTop = div.scrollHeight;
     };
 
     ws.onclose = function(evt) {
-        addMsg("画外音","失去同步！");
+        addMsg("旁白","失去同步！(Websocket结束)");
     };
 
     $("#send").click(
         function () {
-            let v = $("#input option:selected").val()
-            console.log(v);
+            let v = $("#input option:selected").val();
+            addMsg("我", opts[parseInt(v)]);
             ws.send(v)
+        }
+    );
+
+    $("#start").click(function () {
+            if (ws.readyState !== WebSocket.CLOSED){
+                ws.close()
+            }
+            location.reload();
         }
     );
 

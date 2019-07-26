@@ -1,8 +1,11 @@
 
 function addMsg(from, content) {
-
-    $("#alist").append("<h4>"+from+":</h4>");
-    $("#alist").append("<p>"+content+"</p>");
+    if ( typeof(content) == "undefined") {
+        return
+    }
+    let alist = $("#alist");
+    alist.append("<h4>"+from+":</h4>");
+    alist.append("<p>"+content+"</p>");
 }
 
 function updateState(state) {
@@ -12,9 +15,10 @@ function updateState(state) {
 }
 
 function loadOptions(options) {
-    let st = ""
+    opts = options;
+    let st = "";
     for(let i = 0, len = options.length; i < len; i++){
         st += "<option value =\""+ i +"\">"+options[i]+"</option>"
     }
-    $("#input").html(st)
+    $("#input").html(st);
 }

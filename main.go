@@ -2,8 +2,10 @@ package main
 
 import (
 	"WonderfulAdventure/asset"
+	"errors"
 	"github.com/gorilla/sessions"
 	"github.com/gorilla/websocket"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"runtime"
@@ -13,9 +15,10 @@ import (
 const (
 	Version         = "0.0.1"
 	Author          = "ertuil"
-	dbugHost        = "127.0.0.1:8080"
+	debug           = true
+	debugHost       = "127.0.0.1:8080"
 	debugSessionKey = "adwaaabbbccc123fads90wn"
-	Host            = "[::]:80"
+	leaseHost       = "[::]:80"
 )
 
 var (
@@ -38,24 +41,38 @@ func CoreWsHandle(c *websocket.Conn) {
 	defer c.Close()
 
 	se := state{}
-	se.setState(0, 0, 10, "")
+	se.setState(0, 0, 100, "")
 
 	var err error
 	for {
 		switch se.Stage {
 		case 0:
-			err = Stage_0(c, &se)
+			err = Stage0(c, &se)
 		case 1:
-			err = Stage_1(c, &se)
+			err = Stage1(c, &se)
 		case 2:
-			err = Stage_2(c, &se)
+			err = Stage2(c, &se)
 		case 3:
-			err = Stage_3(c, &se)
+			err = Stage3(c, &se)
+		case 4:
+			err = Stage4(c, &se)
+		case 5:
+			err = Stage5(c, &se)
+		case 6:
+			err = Stage6(c, &se)
+		case 7:
+			err = Stage7(c, &se)
 		case 10:
 			getFlag(c, &se)
+		default:
+			err = errors.New(errst)
 		}
 		if err != nil {
-			j, _ := MsgInitJson("系统", err.Error(), []string{}, se)
+			tmp := errst
+			if debug == true {
+				tmp = errst + ":" + err.Error()
+			}
+			j, _ := MsgInitJson("旁白", tmp, []string{}, se)
 			_ = c.WriteMessage(websocket.TextMessage, j)
 			break
 		}
@@ -67,7 +84,7 @@ func CoreWsHandle(c *websocket.Conn) {
 }
 
 func main() {
-	// 争取更多资源
+	// 多核运行
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	// 释放静态资源
@@ -83,8 +100,14 @@ func main() {
 	http.HandleFunc("/ws", WebSocketHandler)
 
 	// 启动服务
-	log.Println("Start listening to", dbugHost)
-	err := http.ListenAndServe(dbugHost, nil) //设置监听的端口
+	var host string
+	if debug {
+		host = debugHost
+	} else {
+		host = leaseHost
+	}
+	log.Println("Start listening to", host)
+	err := http.ListenAndServe(host, nil) //设置监听的端口
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
 	}
@@ -92,8 +115,30 @@ func main() {
 }
 
 func getFlag(c *websocket.Conn, se *state) {
-	flag := "flag{123}"
+	var flag string
+	var err error
+	if debug {
+		flag = readFlagDebug()
+	} else {
+		flag, err = readFlagFromFile("flag.txt")
+		if err != nil {
+			flag = "无法获取flag，请联系管理员。"
+		}
+	}
+
 	j, _ := MsgInitJson("系统", flag, []string{}, *se)
 	_ = c.WriteMessage(websocket.TextMessage, j)
 	se.Stage = 11
+}
+
+func readFlagFromFile(filename string) (string, error) {
+	b, err := ioutil.ReadFile("test.log")
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
+}
+
+func readFlagDebug() string {
+	return "flag{haha_this_is_flag}"
 }
