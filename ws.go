@@ -24,7 +24,6 @@ func Stage0(c *websocket.Conn, se *state) error {
 	if err != nil {
 		return err
 	}
-
 	if opt == 0 {
 		se.Name = s0a0
 		se.Money = se.Money - doorprice
@@ -32,8 +31,10 @@ func Stage0(c *websocket.Conn, se *state) error {
 		se.Name = s0a1
 	}
 
-	se.Stage = GetStateTrans(se.Stage, opt)
-
+	se.Stage,err = GetStateTrans(se.Stage, opt)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -77,7 +78,10 @@ func Stage1(c *websocket.Conn, se *state) error {
 		_ = c.WriteMessage(websocket.TextMessage, j)
 	}
 
-	se.Stage = GetStateTrans(se.Stage, opt)
+	se.Stage,err = GetStateTrans(se.Stage, opt)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
@@ -116,8 +120,10 @@ func Stage3(c *websocket.Conn, se *state) error {
 		return err
 	}
 
-	se.Stage = GetStateTrans(se.Stage, opt)
-
+	se.Stage,err = GetStateTrans(se.Stage, opt)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

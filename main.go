@@ -74,6 +74,7 @@ func CoreWsHandle(c *websocket.Conn) {
 			break
 		}
 		if err != nil {
+			log.Println(err)
 			j, _ := MsgInitJson("旁白", errst, []string{}, se)
 			_ = c.WriteMessage(websocket.TextMessage, j)
 			break

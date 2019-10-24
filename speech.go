@@ -1,5 +1,7 @@
 package main
 
+import "errors"
+
 const (
 	failstate = 11
 	succstate = 10
@@ -88,12 +90,12 @@ func stateTransInit() {
 	stateTrans[3] = []int{4, 5, 6}
 }
 
-func GetStateTrans(from, opt int) int {
+func GetStateTrans(from, opt int) (int,error) {
 	if from < 0 || from >= len(stateTrans) {
-		return failstate
+		return failstate,errors.New("out of index")
 	}
 	if opt < 0 || opt >= len(stateTrans[from]) {
-		return failstate
+		return failstate,errors.New("out of index")
 	}
-	return stateTrans[from][opt]
+	return stateTrans[from][opt],nil
 }

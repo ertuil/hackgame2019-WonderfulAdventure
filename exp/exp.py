@@ -5,7 +5,7 @@ def ta(a):
     ws = create_connection("ws://localhost:8080/ws")
     result = ws.recv()
     print(result)
-    ws.send("0")
+    ws.send("-1")
     result = ws.recv()
     print(result)
     result = ws.recv()
@@ -44,4 +44,4 @@ def ta(a):
     print(result)
     ws.close()
 
-ta(a)
+ta(-100000000000)
